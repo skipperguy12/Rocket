@@ -1,0 +1,4 @@
+name: Rocket
+main: tc.oc.rocket.RocketPlugin
+version: ${project.version}
+author: MonsieurApple
