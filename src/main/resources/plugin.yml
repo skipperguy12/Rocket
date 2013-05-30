@@ -2,3 +2,19 @@ name: Rocket
 main: tc.oc.rocket.RocketPlugin
 version: ${project.version}
 author: MonsieurApple
+
+commands:
+  resetrockets:
+    description: Make all players visible again
+    usage: /<command>
+
+permissions:
+  rocket.reset:
+    description: Allows usage of /resetrockets
+    default: op
+  rocket.rocket:
+    description: Allows rocketing of other players via left click
+    default: true
+  rocket.exempt:
+    description: Exempts users from being rocketed
+    default: op
