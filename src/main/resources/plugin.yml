@@ -4,13 +4,13 @@ version: ${project.version}
 author: MonsieurApple
 
 commands:
-  resetrockets:
-    description: Make all players visible again
-    usage: /<command>
+  rocket:
+    description: Manage rocket settings
+    usage: /<command> [toggle|reset]
 
 permissions:
-  rocket.reset:
-    description: Allows usage of /resetrockets
+  rocket.admin:
+    description: Allows usage of /rocket
     default: op
   rocket.rocket:
     description: Allows rocketing of other players via left click

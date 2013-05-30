@@ -19,7 +19,7 @@ public class RocketListener implements Listener {
 
     @EventHandler
     public void interact(final EntityDamageEvent event) {
-        event.setCancelled(true);
+        if(!this.plugin.ENABLED) return;
         if(!(event instanceof EntityDamageByEntityEvent)) return;
         EntityDamageByEntityEvent realEvent = (EntityDamageByEntityEvent) event;
         if(!(realEvent.getDamager() instanceof Player) || !(realEvent.getEntity() instanceof Player)) return;
@@ -41,6 +41,8 @@ public class RocketListener implements Listener {
 
         RocketUtils.fakeDelta(damager, victim, new Vector(0, 3, 0));
         RocketUtils.takeOff(damager, victim.getLocation());
+
+        event.setCancelled(true);
     }
 
     final RocketPlugin plugin;
