@@ -11,9 +11,7 @@ public class RocketTask implements Runnable{
 
     @Override
     public void run() {
-        Iterator<Rocket> it = this.plugin.rockets.iterator();
-
-        while(it.hasNext()) {
+        for(Iterator<Rocket> it = this.plugin.rockets.iterator(); it.hasNext();) {
             Rocket rocket = it.next();
 
             if(rocket.allFireworksAlive()) {

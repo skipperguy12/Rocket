@@ -1,7 +1,7 @@
 package tc.oc.rocket;
 
 public class RocketConfig {
-    private static String ROCKET_PREFIX = "rocket.";
+    static String ROCKET_PREFIX = "rocket.";
     static String ROCKET_PERMISSION = ROCKET_PREFIX + "rocket";
     static String EXEMPT_PERMISSION = ROCKET_PREFIX + "exempt";
     static String ADMIN_PERMISSION = ROCKET_PREFIX + "admin";

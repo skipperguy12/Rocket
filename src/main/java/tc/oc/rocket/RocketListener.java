@@ -41,6 +41,7 @@ public class RocketListener implements Listener {
 
         RocketUtils.fakeDelta(damager, victim, new Vector(0, 3, 0));
         RocketUtils.takeOff(damager, victim.getLocation());
+        RocketUtils.exclusiveEntities(fireworks, damager);
 
         event.setCancelled(true);
     }

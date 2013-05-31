@@ -54,7 +54,7 @@ public final class RocketPlugin extends JavaPlugin {
         if(args[0].equals("toggle")) {
             this.ENABLED = !this.ENABLED;
 
-            sender.sendMessage(ChatColor.GOLD + "Rockets have been " + (this.ENABLED ? ChatColor.GREEN : ChatColor.RED) + "disabled");
+            sender.sendMessage(ChatColor.GOLD + "Rockets have been " + (this.ENABLED ? ChatColor.GREEN : ChatColor.RED) + (this.ENABLED ? "enabled" : "disabled"));
         }
 
         return true;

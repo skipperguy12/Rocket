@@ -1,5 +1,6 @@
 package tc.oc.rocket;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.server.v1_5_R3.Packet;
@@ -7,6 +8,7 @@ import net.minecraft.server.v1_5_R3.Packet31RelEntityMove;
 
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -14,8 +16,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
+import com.google.common.collect.Lists;
+
 public class RocketUtils {
     static Random random = new Random();
+    static List<Color> colors = Lists.newArrayList(Color.AQUA, Color.BLUE, Color.FUCHSIA, Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, Color.NAVY, Color.OLIVE, Color.ORANGE, Color.PURPLE, Color.RED, Color.TEAL, Color.YELLOW);
 
     public static Firework getRandomFirework(Location loc) {
         FireworkMeta fireworkMeta = (FireworkMeta) (new ItemStack(Material.FIREWORK)).getItemMeta();
@@ -37,25 +42,7 @@ public class RocketUtils {
     }
 
     public static Color randomColor() {
-        int color = random.nextInt(12);
-
-        switch(color) {
-            case 0: return Color.AQUA;
-            case 1: return Color.BLUE;
-            case 2: return Color.FUCHSIA;
-            case 3: return Color.GREEN;
-            case 4: return Color.LIME;
-            case 5: return Color.MAROON;
-            case 6: return Color.NAVY;
-            case 7: return Color.OLIVE;
-            case 8: return Color.ORANGE;
-            case 9: return Color.PURPLE;
-            case 10: return Color.RED;
-            case 11: return Color.TEAL;
-            case 12: return Color.YELLOW;
-        }
-
-        return Color.BLACK;
+        return colors.get(random.nextInt(colors.size()));
     }
 
     public static void takeOff(Player observer, Location loc) {
@@ -76,5 +63,18 @@ public class RocketUtils {
 
     private static void sendPacket(CraftPlayer player, Packet packet) {
         player.getHandle().playerConnection.sendPacket(packet);
+    }
+
+    public static void exclusiveEntities(List<? extends Entity> entities, Player observer) {
+        for(Entity entity : entities) {
+            exclusiveEntity(entity, observer);
+        }
+    }
+
+    public static void exclusiveEntity(Entity entity, Player observer) {
+        for(Player player : observer.getWorld().getPlayers()) {
+            if(player == observer || !player.canSee(entity)) continue;
+            player.hide(entity);
+        }
     }
 }

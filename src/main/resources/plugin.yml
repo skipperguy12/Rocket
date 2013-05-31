@@ -17,4 +17,4 @@ permissions:
     default: true
   rocket.exempt:
     description: Exempts users from being rocketed
-    default: op
+    default: false
