@@ -3,11 +3,15 @@ package tc.oc.rocket;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.server.v1_6_R2.Packet;
-import net.minecraft.server.v1_6_R2.Packet31RelEntityMove;
+import net.minecraft.server.v1_6_R3.Packet;
+import net.minecraft.server.v1_6_R3.Packet31RelEntityMove;
 
-import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_6_R2.entity.CraftPlayer;
+import org.bukkit.Color;
+import org.bukkit.Effect;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -19,73 +23,68 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 public class RocketUtils {
-    static Random random = new Random();
-    static List<Color> colors = Lists.newArrayList(Color.AQUA, Color.BLUE, Color.FUCHSIA, Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, Color.NAVY, Color.OLIVE, Color.ORANGE, Color.PURPLE, Color.RED, Color.TEAL, Color.YELLOW);
-    static List<Color> hallowedcolors = Lists.newArrayList(Color.BLACK, Color.ORANGE);
-    static List<Color> festivedcolors = Lists.newArrayList(Color.GREEN, Color.WHITE, Color.RED, Color.ORANGE);
+	static Random random = new Random();
+	static List<Color> colors = Lists.newArrayList(Color.AQUA, Color.BLUE, Color.FUCHSIA, Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, Color.NAVY, Color.OLIVE, Color.ORANGE, Color.PURPLE, Color.RED, Color.TEAL, Color.YELLOW);
+	static List<Color> hallowedcolors = Lists.newArrayList(Color.BLACK, Color.ORANGE);
+	static List<Color> festivedcolors = Lists.newArrayList(Color.GREEN, Color.WHITE, Color.RED, Color.ORANGE);
 
-    public static Firework getRandomFirework(Location loc) {
-        FireworkMeta fireworkMeta = (FireworkMeta) (new ItemStack(Material.FIREWORK)).getItemMeta();
-        Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+	public static Firework getRandomFirework(Location loc) {
+		FireworkMeta fireworkMeta = (FireworkMeta) (new ItemStack(Material.FIREWORK)).getItemMeta();
+		Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 
-        fireworkMeta.setPower(RocketConfig.FIREWORK_POWER);
-        fireworkMeta.addEffect(FireworkEffect.builder()
-                    .with(RocketUtils.randomFireworkType())
-                    .withColor(RocketUtils.randomColor())
-                    .trail(RocketConfig.FIREWORK_TRAIL)
-                    .build());
+		fireworkMeta.setPower(RocketConfig.FIREWORK_POWER);
+		fireworkMeta.addEffect(FireworkEffect.builder().with(RocketUtils.randomFireworkType()).withColor(RocketUtils.randomColor()).trail(RocketConfig.FIREWORK_TRAIL).build());
 
-        firework.setFireworkMeta(fireworkMeta);
-        return firework;
-    }
+		firework.setFireworkMeta(fireworkMeta);
+		return firework;
+	}
 
-    public static FireworkEffect.Type randomFireworkType() {
-        return FireworkEffect.Type.values()[random.nextInt(FireworkEffect.Type.values().length)];
-    }
+	public static FireworkEffect.Type randomFireworkType() {
+		return FireworkEffect.Type.values()[random.nextInt(FireworkEffect.Type.values().length)];
+	}
 
-    public static Color randomColor() {
-        if (RocketConfig.hallow) {
-            return hallowedcolors.get(random.nextInt(hallowedcolors.size()));
-        }
-        if (RocketConfig.festive) {
-            return festivedcolors.get(random.nextInt(festivedcolors.size()));
-        }
-        else {
-        return colors.get(random.nextInt(colors.size()));
-    }}
+	public static Color randomColor() {
+		switch (RocketConfig.mode) {
+			case HALLOW :
+				return hallowedcolors.get(random.nextInt(hallowedcolors.size()));
+			case FESTIVE :
+				return festivedcolors.get(random.nextInt(festivedcolors.size()));
+			default :
+				return colors.get(random.nextInt(colors.size()));
+		}
+	}
 
+	public static void takeOff(Player observer, Location loc) {
+		for (int i = 0; i < RocketConfig.SMOKE_COUNT; i++) {
+			double angle = 2 * Math.PI * i / RocketConfig.SMOKE_COUNT;
+			Location base = loc.clone().add(new Vector(RocketConfig.SMOKE_RADIUS * Math.cos(angle), 0, RocketConfig.SMOKE_RADIUS * Math.sin(angle)));
+			for (int j = 0; j <= 8; j++) {
+				observer.playEffect(base, Effect.SMOKE, j);
+			}
+		}
+	}
 
-    public static void takeOff(Player observer, Location loc) {
-        for(int i = 0; i < RocketConfig.SMOKE_COUNT; i++) {
-            double angle = 2 * Math.PI * i / RocketConfig.SMOKE_COUNT;
-            Location base = loc.clone().add(new Vector(RocketConfig.SMOKE_RADIUS * Math.cos(angle), 0, RocketConfig.SMOKE_RADIUS * Math.sin(angle)));
-            for(int j = 0; j <= 8; j++) {
-                observer.playEffect(base, Effect.SMOKE, j);
-            }
-        }
-    }
+	public static void fakeDelta(Player observer, Player victim, Vector delta) {
+		Packet packet = new Packet31RelEntityMove(((CraftPlayer) victim).getHandle().id, (byte) (delta.getX() * 32), (byte) (delta.getY() * 32), (byte) (delta.getZ() * 32));
 
-    public static void fakeDelta(Player observer, Player victim, Vector delta) {
-        Packet packet = new Packet31RelEntityMove(((CraftPlayer) victim).getHandle().id, (byte) (delta.getX() * 32), (byte) (delta.getY() * 32), (byte) (delta.getZ() * 32));
+		sendPacket((CraftPlayer) observer, packet);
+	}
 
-        sendPacket((CraftPlayer) observer, packet);
-    }
+	private static void sendPacket(CraftPlayer player, Packet packet) {
+		player.getHandle().playerConnection.sendPacket(packet);
+	}
 
-    private static void sendPacket(CraftPlayer player, Packet packet) {
-        player.getHandle().playerConnection.sendPacket(packet);
-    }
+	public static void exclusiveEntities(List<? extends Entity> entities, Player observer) {
+		for (Entity entity : entities) {
+			exclusiveEntity(entity, observer);
+		}
+	}
 
-    public static void exclusiveEntities(List<? extends Entity> entities, Player observer) {
-        for(Entity entity : entities) {
-            exclusiveEntity(entity, observer);
-        }
-    }
-
-    public static void exclusiveEntity(Entity entity, Player observer) {
-        for(Player player : observer.getWorld().getPlayers()) {
-            if(player == observer || !player.canSee(entity)) continue;
-            player.hide(entity);
-        }
-    }
-
+	public static void exclusiveEntity(Entity entity, Player observer) {
+		for (Player player : observer.getWorld().getPlayers()) {
+			if (player == observer || !player.canSee(entity))
+				continue;
+			player.hide(entity);
+		}
+	}
 }

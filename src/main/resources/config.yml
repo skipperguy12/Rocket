@@ -1,3 +1,4 @@
 #Rocket Config
-festive: false
-hallow: false
+Rocket:
+    effects:
+        colormode: default

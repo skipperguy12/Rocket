@@ -13,60 +13,54 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.google.common.collect.Lists;
 
 public final class RocketPlugin extends JavaPlugin {
-    public final List<Rocket> rockets = Lists.newArrayList();
-    public boolean ENABLED = true;
+	public final List<Rocket> rockets = Lists.newArrayList();
+	public boolean ENABLED = true;
 
-    private static RocketPlugin i;
+	public void onLoad() {
+	}
 
-    public void onLoad() {
-        RocketPlugin.i = this;
-    }
+	@Override
+	public void onDisable() {
+	}
 
-    public static RocketPlugin get() {
-        return RocketPlugin.i;
-    }
+	@Override
+	public void onEnable() {
+		this.getServer().getPluginManager().registerEvents(new RocketListener(this), this);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new RocketTask(this), 0, RocketConfig.TICK_UPDATE_DELAY);
+	}
 
-    @Override
-    public void onDisable() {
-    }
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (!sender.hasPermission(RocketConfig.ADMIN_PERMISSION)) {
+			sender.sendMessage(ChatColor.RED + "No permission");
+			return true;
+		}
 
-    @Override
-    public void onEnable() {
-    	this.getServer().getPluginManager().registerEvents(new RocketListener(this), this);
-    	this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new RocketTask(this), 0, RocketConfig.TICK_UPDATE_DELAY);
-    }
+		if (args.length == 0) {
+			sender.sendMessage(ChatColor.RED + "Usage: /rocket [toggle|reset]");
+			return true;
+		}
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!sender.hasPermission(RocketConfig.ADMIN_PERMISSION)) {
-            sender.sendMessage(ChatColor.RED + "No permission");
-            return true;
-        }
+		if (args[0].equals("reset")) {
+			for (World world : Bukkit.getWorlds()) {
+				for (Player player1 : world.getPlayers()) {
+					for (Player player2 : world.getPlayers()) {
+						if (player1 == player2)
+							continue;
+						player1.showPlayer(player2);
+					}
+				}
+			}
 
-        if(args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "Usage: /rocket [toggle|reset]");
-            return true;
-        }
+			sender.sendMessage(ChatColor.GREEN + "Rockets reset");
+		}
 
-        if(args[0].equals("reset")) {
-            for(World world : Bukkit.getWorlds()) {
-                for(Player player1 : world.getPlayers()) {
-                    for(Player player2 : world.getPlayers()) {
-                        if(player1 == player2) continue;
-                        player1.showPlayer(player2);
-                    }
-                }
-            }
+		if (args[0].equals("toggle")) {
+			this.ENABLED = !this.ENABLED;
 
-            sender.sendMessage(ChatColor.GREEN + "Rockets reset");
-        }
+			sender.sendMessage(ChatColor.GOLD + "Rockets have been " + (this.ENABLED ? ChatColor.GREEN : ChatColor.RED) + (this.ENABLED ? "enabled" : "disabled"));
+		}
 
-        if(args[0].equals("toggle")) {
-            this.ENABLED = !this.ENABLED;
-
-            sender.sendMessage(ChatColor.GOLD + "Rockets have been " + (this.ENABLED ? ChatColor.GREEN : ChatColor.RED) + (this.ENABLED ? "enabled" : "disabled"));
-        }
-
-        return true;
-    }
+		return true;
+	}
 }
