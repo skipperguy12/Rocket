@@ -15,4 +15,6 @@ public class RocketConfig {
 
     static double SMOKE_RADIUS = 0.1;
     static int SMOKE_COUNT = 6;
+    static boolean hallow = RocketPlugin.get().getConfig().getBoolean("hallow");
+    static boolean festive = RocketPlugin.get().getConfig().getBoolean("festive");
 }

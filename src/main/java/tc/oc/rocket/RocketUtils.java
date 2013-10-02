@@ -21,6 +21,8 @@ import com.google.common.collect.Lists;
 public class RocketUtils {
     static Random random = new Random();
     static List<Color> colors = Lists.newArrayList(Color.AQUA, Color.BLUE, Color.FUCHSIA, Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, Color.NAVY, Color.OLIVE, Color.ORANGE, Color.PURPLE, Color.RED, Color.TEAL, Color.YELLOW);
+    static List<Color> hallowedcolors = Lists.newArrayList(Color.BLACK, Color.ORANGE);
+    static List<Color> festivedcolors = Lists.newArrayList(Color.GREEN, Color.WHITE, Color.RED, Color.ORANGE);
 
     public static Firework getRandomFirework(Location loc) {
         FireworkMeta fireworkMeta = (FireworkMeta) (new ItemStack(Material.FIREWORK)).getItemMeta();
@@ -42,8 +44,16 @@ public class RocketUtils {
     }
 
     public static Color randomColor() {
+        if (RocketConfig.hallow) {
+            return hallowedcolors.get(random.nextInt(hallowedcolors.size()));
+        }
+        if (RocketConfig.festive) {
+            return festivedcolors.get(random.nextInt(festivedcolors.size()));
+        }
+        else {
         return colors.get(random.nextInt(colors.size()));
-    }
+    }}
+
 
     public static void takeOff(Player observer, Location loc) {
         for(int i = 0; i < RocketConfig.SMOKE_COUNT; i++) {
@@ -76,5 +86,9 @@ public class RocketUtils {
             if(player == observer || !player.canSee(entity)) continue;
             player.hide(entity);
         }
+    }
+
+    public static void spawnbat(Location loc, Player observer) {
+        observer.getWorld().spawnCreature(player.getLocation(), EntityType.BAT);
     }
 }

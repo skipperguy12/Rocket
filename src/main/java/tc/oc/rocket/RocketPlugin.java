@@ -16,6 +16,16 @@ public final class RocketPlugin extends JavaPlugin {
     public final List<Rocket> rockets = Lists.newArrayList();
     public boolean ENABLED = true;
 
+    private static RocketPlugin i;
+
+    public void onLoad() {
+        RocketPlugin.i = this;
+    }
+
+    public static RocketPlugin get() {
+        return RocketPlugin.i;
+    }
+
     @Override
     public void onDisable() {
     }
