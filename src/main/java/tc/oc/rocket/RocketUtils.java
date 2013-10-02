@@ -88,7 +88,4 @@ public class RocketUtils {
         }
     }
 
-    public static void spawnbat(Location loc, Player observer) {
-        observer.getWorld().spawnCreature(player.getLocation(), EntityType.BAT);
-    }
 }
